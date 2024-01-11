@@ -31,12 +31,12 @@ public class AopAuth {
     public void before(JoinPoint joinPoint, Auth auth) throws Exception {
         String jwt = request.getHeader("Authorization");
         String userName = authUtils.verifyJwt(jwt);
+        UserEntity user = userName == null ? null : userMapper.getUserByName(userName);
 
-        if (auth.type() == Auth.Type.USER) {
-            if (userName == null) throw new NotUserException();
-        } else if (auth.type() == Auth.Type.ADMIN) {
-            if (userName == null) throw new NotUserException();
-            UserEntity user = userMapper.getUserByName(userName);
+        if (auth.type() != Auth.Type.BASE) {
+            if (user == null) throw new NotUserException();
+        }
+        if (auth.type() == Auth.Type.ADMIN) {
             if (!user.is_admin()) throw new NotAdminException();
         }
 

@@ -41,12 +41,12 @@ public class AuthUtils {
                     .parseSignedClaims(jwt).getPayload().getSubject();
             return userName;
         } catch (JwtException e) {
-            // not valid
+            // if not valid
             return null;
         }
     }
 
-    public String verifyJwtFromHeader() {
+    public String getCurrentUserName() {
         String jwt = request.getHeader("Authorization");
         return verifyJwt(jwt);
     }

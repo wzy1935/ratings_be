@@ -20,7 +20,9 @@ public class UserService {
 
         String encodedPassword = authUtils.encode(password);
         UserEntity user = userMapper.getUserByName(name);
-        if (!Objects.equals(user.password(), encodedPassword)) return new LoginRT("INCORRECT", null);
+        if (user == null || !Objects.equals(user.password(), encodedPassword)) {
+            return new LoginRT("INCORRECT", null);
+        }
 
         String jwt = authUtils.createJwt(name);
         return new LoginRT("SUCCESS", jwt);
@@ -46,5 +48,13 @@ public class UserService {
         UserEntity newUser = new UserEntity(user.id(), user.name(), authUtils.encode(newPassword), user.is_admin());
         userMapper.updateUserById(newUser);
         return "SUCCESS";
+    }
+
+    public String checkRoleByName(String userName) {
+        if (userName == null) return "BASE";
+
+        UserEntity user = userMapper.getUserByName(userName);
+        boolean isAdmin = user.is_admin();
+        return isAdmin ? "ADMIN" : "USER";
     }
 }
