@@ -1,6 +1,5 @@
 package com.sc.ratings.controllers;
 
-import com.sc.ratings.entities.UserEntity;
 import com.sc.ratings.mappers.UserMapper;
 import com.sc.ratings.services.UserService;
 import com.sc.ratings.utils.AuthUtils;

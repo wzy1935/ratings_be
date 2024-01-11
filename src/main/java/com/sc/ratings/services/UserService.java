@@ -14,9 +14,13 @@ public class UserService {
     @Autowired
     AuthUtils authUtils;
 
+    static boolean checkNames(String name) {
+        return name.length() < 20 && name.strip().length() > 0;
+    }
+
     public record LoginRT(String code, String jwt) {}
     public LoginRT login(String name, String password) {
-        if (name.length() > 20 || password.length() > 20) return new LoginRT("INVALID", null);
+        if (!(checkNames(name) && checkNames(password))) return new LoginRT("INVALID", null);
 
         String encodedPassword = authUtils.encode(password);
         UserEntity user = userMapper.getUserByName(name);
@@ -29,7 +33,7 @@ public class UserService {
     }
 
     public String signup(String name, String password) {
-        if (name.length() > 20 || password.length() > 20) return "INVALID";
+        if (!(checkNames(name) && checkNames(password))) return "INVALID";
 
         UserEntity user = userMapper.getUserByName(name);
         if (user != null) return "ALREADY_EXISTED";
@@ -41,7 +45,7 @@ public class UserService {
     }
 
     public String changePassword(String name, String oldPassword, String newPassword) {
-        if (newPassword.length() > 20) return "INVALID";
+        if (checkNames(newPassword)) return "INVALID";
         UserEntity user = userMapper.getUserByName(name);
         if (!authUtils.encode(oldPassword).equals(user.password())) return "WRONG_OLD_PASSWORD";
 

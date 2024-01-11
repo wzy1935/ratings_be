@@ -1,8 +1,8 @@
 package com.sc.ratings.utils.authaop;
 
 import com.sc.ratings.entities.UserEntity;
-import com.sc.ratings.exceptions.NotAdminException;
-import com.sc.ratings.exceptions.NotUserException;
+import com.sc.ratings.exceptions.ForbiddenException;
+import com.sc.ratings.exceptions.UnauthorizedException;
 import com.sc.ratings.mappers.UserMapper;
 import com.sc.ratings.utils.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,10 +34,10 @@ public class AopAuth {
         UserEntity user = userName == null ? null : userMapper.getUserByName(userName);
 
         if (auth.type() != Auth.Type.BASE) {
-            if (user == null) throw new NotUserException();
+            if (user == null) throw new UnauthorizedException();
         }
         if (auth.type() == Auth.Type.ADMIN) {
-            if (!user.is_admin()) throw new NotAdminException();
+            if (!user.is_admin()) throw new ForbiddenException();
         }
 
     }
