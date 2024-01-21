@@ -2,6 +2,7 @@ package com.sc.ratings.services;
 
 import com.sc.ratings.entities.BoardEntity;
 import com.sc.ratings.entities.RatingEntity;
+import com.sc.ratings.exceptions.UnauthorizedException;
 import com.sc.ratings.mappers.BoardMapper;
 import com.sc.ratings.mappers.RatingMapper;
 import com.sc.ratings.mappers.UserMapper;
@@ -26,6 +27,15 @@ public class RatingService {
     UserMapper userMapper;
 
     public record GetPageRatingRT(String code, Integer totalCnt, List<RatingEntity> ratingList){}
+    public record GetRatingRT(String code, RatingEntity rating){}
+
+
+    private boolean isRatingCreatorOrAdmin(String creatorName){
+        String userName = authUtils.getCurrentUserName();
+        boolean isAdmin = userMapper.getUserByName(userName).is_admin();
+        if (isAdmin || userName.equals(creatorName))  return true;
+        return false;
+    }
 
     static boolean checkScore(Integer score) {
         return score>=1&&score<=5;
@@ -69,16 +79,72 @@ public class RatingService {
         RatingEntity ratingNew = new RatingEntity(null,description,score,board_id,userId,userName);
         ratingMapper.addRating(ratingNew);
         //待改成数组
-        Integer[] scoreNum = {board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()};
+        Integer[] scoreCnt = {board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()};
         Integer scoreSum = 0;
-        Integer userSum = 0;
+        Integer userCnt = 0;
         for (int i=0;i<5;i++){
-            scoreSum+=(i+1)*scoreNum[i];
-            if(score == i+1) scoreNum[i]+=1;
-            userSum+=scoreNum[i];
+            scoreSum+=(i+1)*scoreCnt[i];
+            if(score == i+1) scoreCnt[i]+=1;
+            userCnt+=scoreCnt[i];
         }
-        Float averageScore = (float) ((scoreSum+score)/userSum);
-        boardMapper.updateBoardScore(board_id,averageScore,scoreNum[0],scoreNum[1],scoreNum[2],scoreNum[3],scoreNum[4]);
+        Float average =  ((scoreSum+score)/(float)userCnt);
+        boardMapper.updateBoardScore(board_id,average,scoreCnt[0],scoreCnt[1],scoreCnt[2],scoreCnt[3],scoreCnt[4]);
         return "SUCCESS";
     }
+
+    //已测试
+    public GetRatingRT getRating(Integer ratingId) {
+        //INVALID
+        RatingEntity rating = ratingMapper.getRatingById(ratingId);
+        if (rating == null) {
+            return new GetRatingRT("NOT_EXIST", null);
+        }
+        return new GetRatingRT("SUCCESS", rating);
+    }
+
+    public String modifyRating(Integer ratingId, Integer score, String description) {
+        if(!(checkScore(score) && checkDescription(description))) return "INVALID";
+        RatingEntity rating = ratingMapper.getRatingById(ratingId);
+        if(score.equals(rating.score())) return "INVALID";
+        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new UnauthorizedException();
+        if(rating == null) return "NOT_EXIST";
+        ratingMapper.updateRatingById(ratingId,score,description);
+        BoardEntity board = boardMapper.getBoardById(rating.board_id());
+        Integer[] scoreCnt = {board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()};
+        Integer scoreSum = 0;
+        Integer userCnt = 0;
+        Integer oldScore = rating.score();
+        for (int i=0;i<5;i++){
+            scoreSum+=(i+1)*scoreCnt[i];
+            if(score == i+1) scoreCnt[i]+=1;
+            if(oldScore == i+1) scoreCnt[i]-=1;
+            userCnt+=scoreCnt[i];
+        }
+        Float average =  ((scoreSum+score-oldScore)/(float)userCnt);
+        boardMapper.updateBoardScore(rating.board_id(),average,scoreCnt[0],scoreCnt[1],scoreCnt[2],scoreCnt[3],scoreCnt[4]);
+        return "SUCCESS";
+    }
+
+    public String deleteRating(Integer ratingId){
+        if (ratingId <= 0) return "INVALID";
+        RatingEntity rating = ratingMapper.getRatingById(ratingId);
+        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new UnauthorizedException();
+        if (rating == null) return "NOT_EXIST";
+        ratingMapper.deleteRatingById(ratingId);
+        BoardEntity board = boardMapper.getBoardById(rating.board_id());
+        Integer[] scoreCnt = {board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()};
+        Integer scoreSum = 0;
+        Integer userCnt = 0;
+        Integer oldScore = rating.score();
+        for (int i=0;i<5;i++){
+            scoreSum+=(i+1)*scoreCnt[i];
+            if(oldScore == i+1) scoreCnt[i]-=1;
+            userCnt+=scoreCnt[i];
+        }
+        Float average = ((scoreSum-oldScore)/(float)userCnt);
+        boardMapper.updateBoardScore(rating.board_id(),average,scoreCnt[0],scoreCnt[1],scoreCnt[2],scoreCnt[3],scoreCnt[4]);
+        return "SUCCESS";
+    }
+
+
 }

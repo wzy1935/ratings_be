@@ -37,7 +37,7 @@ public class BoardService {
         return true;
     }
 
-    boolean isBoardCreatorOrAdmin(String creatorName){
+    private boolean isBoardCreatorOrAdmin(String creatorName){
         String userName = authUtils.getCurrentUserName();
         boolean isAdmin = userMapper.getUserByName(userName).is_admin();
 //        System.out.println(userName);
@@ -57,7 +57,7 @@ public class BoardService {
         if (board_id <= 0) return new BoardService.GetBoardRT("INVALID", null);
         BoardEntity board = boardMapper.getBoardById(board_id);
         if (board == null) {
-            return new BoardService.GetBoardRT("INCORRECT", null);
+            return new BoardService.GetBoardRT("NOT_EXIST", null);
         }
         return new BoardService.GetBoardRT("SUCCESS", board);
     }

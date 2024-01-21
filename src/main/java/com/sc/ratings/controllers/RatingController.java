@@ -51,6 +51,8 @@ public class RatingController {
 
     public record PageRatingPT(Integer board_id, Integer page, Integer per_page){}
     public record RatingPT(Integer board_id,Integer score, String description){}
+    public record RatingIdPT(Integer rating_id){}
+    public record ModifyRatingPT(Integer rating_id, Integer score, String description){}
 
     @GetMapping("api/rating/get-page")
     public RespData getPageRating(@RequestBody PageRatingPT pt) {
@@ -69,6 +71,30 @@ public class RatingController {
     @PostMapping("/api/rating/create")
     public RespData createBoard(@RequestBody RatingPT rating){
         String code = ratingService.createRating(rating.board_id(),rating.score(), rating.description());
+        return RespData.resp(code);
+    }
+
+    @GetMapping("api/rating/get")
+    public RespData getRating(@RequestBody RatingIdPT pt) {
+        var getRatingRT = ratingService.getRating(pt.rating_id);
+        if (getRatingRT.code().equals("SUCCESS")) {
+            DataMap returnData = getRatingData(getRatingRT.rating());
+            return RespData.resp(getRatingRT.code(), returnData);
+        }
+        return RespData.resp(getRatingRT.code());
+    }
+
+    @Auth(type = Auth.Type.USER)
+    @PostMapping("api/rating/modify")
+    public RespData modifyRating(@RequestBody ModifyRatingPT pt){
+        String code = ratingService.modifyRating(pt.rating_id(),pt.score(),pt.description());
+        return RespData.resp(code);
+    }
+
+    @Auth(type = Auth.Type.USER)
+    @PostMapping("api/rating/delete")
+    public RespData deleteRating(@RequestBody RatingIdPT pt){
+        String code = ratingService.deleteRating(pt.rating_id());
         return RespData.resp(code);
     }
 
