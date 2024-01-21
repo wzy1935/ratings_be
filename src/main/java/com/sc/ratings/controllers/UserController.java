@@ -19,8 +19,8 @@ public class UserController {
     @Autowired
     UserMapper userMapper;
 
-    record UserPT(String name, String password) {}
-    record ChangePasswordPT(String old_password, String new_password) {}
+    public record UserPT(String name, String password) {}
+    public record ChangePasswordPT(String old_password, String new_password) {}
 
     @PostMapping("api/user/login")
     public RespData login(@RequestBody UserPT user) {

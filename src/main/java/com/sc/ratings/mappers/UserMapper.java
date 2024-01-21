@@ -12,6 +12,9 @@ public interface UserMapper {
     @Select("select id, name, password, is_admin from app_user where name=#{name} limit 1")
     UserEntity getUserByName(String name);
 
+    @Select("select id, name, password, is_admin from app_user where id=#{id}")
+    UserEntity getUserById(Integer id);
+
     @Insert("insert into app_user (name, password, is_admin) values (#{name}, #{password}, #{is_admin})")
     void addUser(UserEntity user);
 

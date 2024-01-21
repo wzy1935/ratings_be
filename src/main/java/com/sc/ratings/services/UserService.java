@@ -45,7 +45,7 @@ public class UserService {
     }
 
     public String changePassword(String name, String oldPassword, String newPassword) {
-        if (checkNames(newPassword)) return "INVALID";
+//        if (checkNames(newPassword)) return "INVALID";
         UserEntity user = userMapper.getUserByName(name);
         if (!authUtils.encode(oldPassword).equals(user.password())) return "WRONG_OLD_PASSWORD";
 
