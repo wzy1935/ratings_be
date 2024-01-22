@@ -36,6 +36,7 @@ public class BoardController {
                 .set("description", board.description())
                 .set("overall_score", board.overall_score())
                 .set("scores", new Integer[]{board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()})
+                .set("total_cnt", board.score_1()+board.score_2()+board.score_3()+board.score_4()+board.score_5())
                 .set("creator", DataMap.builder()
                         .set("user_id", board.creator_id())
                         .set("user_name", board.creator_name())
