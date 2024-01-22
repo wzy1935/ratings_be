@@ -50,6 +50,7 @@ public class RatingController {
     public record RatingPT(Integer board_id,Integer score, String description){}
     public record RatingIdPT(Integer rating_id){}
     public record ModifyRatingPT(Integer rating_id, Integer score, String description){}
+    public record GetUserRatingPT(Integer user_id,Integer board_id){}
 
     @GetMapping("api/rating/get-page")
     public RespData getPageRating(@ModelAttribute PageRatingPT pt) {
@@ -74,6 +75,16 @@ public class RatingController {
     @GetMapping("api/rating/get")
     public RespData getRating(@ModelAttribute RatingIdPT pt) {
         var getRatingRT = ratingService.getRating(pt.rating_id);
+        if (getRatingRT.code().equals("SUCCESS")) {
+            DataMap returnData = getRatingData(getRatingRT.rating());
+            return RespData.resp(getRatingRT.code(), returnData);
+        }
+        return RespData.resp(getRatingRT.code());
+    }
+
+    @GetMapping("api/rating/get-user")
+    public RespData getUserRating(@ModelAttribute GetUserRatingPT pt) {
+        var getRatingRT = ratingService.getUserRating(pt.user_id, pt.board_id);
         if (getRatingRT.code().equals("SUCCESS")) {
             DataMap returnData = getRatingData(getRatingRT.rating());
             return RespData.resp(getRatingRT.code(), returnData);

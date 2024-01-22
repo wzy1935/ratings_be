@@ -101,8 +101,11 @@ public class BoardService {
     //已测试
     public GetPageBoardRT getPageBoard(Integer page, Integer per_page, Integer user_id) {
         List<BoardEntity> getList;
+        List<BoardEntity> totalList;
+        totalList = boardMapper.getBoardsByAll();
+        Integer totalCnt = totalList.size();
         if (user_id==-1){
-            getList = boardMapper.getBoardsByAll();
+            getList = totalList;
         }
         else if(userMapper.getUserById(user_id)!=null){
             getList = boardMapper.getBoardsById(user_id);
@@ -120,7 +123,6 @@ public class BoardService {
         for (int i=start;i<end;i++){
             returnList.add(getList.get(i));
         }
-        Integer totalCnt = returnList.size();
         return new GetPageBoardRT("SUCCESS",totalCnt,returnList);
     }
 

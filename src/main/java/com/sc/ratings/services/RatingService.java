@@ -146,5 +146,14 @@ public class RatingService {
         return "SUCCESS";
     }
 
+    public GetRatingRT getUserRating(Integer userId, Integer boardId){
+        RatingEntity rating = ratingMapper.getRatingByBUId(boardId,userId);
+        if (rating == null) {
+            return new GetRatingRT("NOT_EXIST", null);
+        }
+        return new GetRatingRT("SUCCESS", rating);
+
+    }
+
 
 }
