@@ -10,10 +10,7 @@ import com.sc.ratings.utils.DataMap;
 import com.sc.ratings.utils.RespData;
 import com.sc.ratings.utils.authaop.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +53,7 @@ public class BoardController {
     }
 
     @GetMapping("api/board/get")
-    public RespData getBoard(@RequestBody BoardIdPT pt) {
+    public RespData getBoard(@ModelAttribute BoardIdPT pt) {
         var getBoardRT = boardService.getBoard(pt.board_id);
         if (getBoardRT.code().equals("SUCCESS")) {
             DataMap returnData = getBoardData(getBoardRT.board());
@@ -88,7 +85,7 @@ public class BoardController {
 
 
     @GetMapping("api/board/get-page")
-    public RespData getPageBoard(@RequestBody PageBoardPT pt) {
+    public RespData getPageBoard(@ModelAttribute PageBoardPT pt) {
         var getPageBoardRT = boardService.getPageBoard(pt.page(),pt.per_page(),pt.user_id());
         if (getPageBoardRT.code().equals("SUCCESS")) {
             var returnData = DataMap.builder()

@@ -11,10 +11,7 @@ import com.sc.ratings.utils.DataMap;
 import com.sc.ratings.utils.RespData;
 import com.sc.ratings.utils.authaop.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +52,7 @@ public class RatingController {
     public record ModifyRatingPT(Integer rating_id, Integer score, String description){}
 
     @GetMapping("api/rating/get-page")
-    public RespData getPageRating(@RequestBody PageRatingPT pt) {
+    public RespData getPageRating(@ModelAttribute PageRatingPT pt) {
         var getPageRatingRT = ratingService.getPageRating(pt.board_id(),pt.page(),pt.per_page());
         if (getPageRatingRT.code().equals("SUCCESS")) {
             var returnData = DataMap.builder()
@@ -75,7 +72,7 @@ public class RatingController {
     }
 
     @GetMapping("api/rating/get")
-    public RespData getRating(@RequestBody RatingIdPT pt) {
+    public RespData getRating(@ModelAttribute RatingIdPT pt) {
         var getRatingRT = ratingService.getRating(pt.rating_id);
         if (getRatingRT.code().equals("SUCCESS")) {
             DataMap returnData = getRatingData(getRatingRT.rating());
