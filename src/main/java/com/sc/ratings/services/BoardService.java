@@ -108,12 +108,15 @@ public class BoardService {
         if (user_id==-1){
             getList = totalList;
         }
-        else if(userMapper.getUserById(user_id)!=null){
-            getList = boardMapper.getBoardsById(user_id);
+        else {
+            if (userMapper.getUserById(user_id) != null) {
+                getList = boardMapper.getBoardsById(user_id);
+                if (getList.size()==0)
+                    return new GetPageBoardRT("NOT_EXIST", null, null);
+            }
+            else
+                return new GetPageBoardRT("NOT_EXIST", null, null);
         }
-        else
-            return new GetPageBoardRT("NOT_EXIST",null,null);
-
         Integer size = getList.size();
         if (!checkPage(page,per_page,size))
             return new GetPageBoardRT("INVALID",null,null);
