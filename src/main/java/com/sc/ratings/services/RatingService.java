@@ -2,6 +2,7 @@ package com.sc.ratings.services;
 
 import com.sc.ratings.entities.BoardEntity;
 import com.sc.ratings.entities.RatingEntity;
+import com.sc.ratings.exceptions.ForbiddenException;
 import com.sc.ratings.exceptions.UnauthorizedException;
 import com.sc.ratings.mappers.BoardMapper;
 import com.sc.ratings.mappers.RatingMapper;
@@ -106,7 +107,7 @@ public class RatingService {
         if(!(checkScore(score) && checkDescription(description))) return "INVALID";
         RatingEntity rating = ratingMapper.getRatingById(ratingId);
         if(score.equals(rating.score())) return "INVALID";
-        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new UnauthorizedException();
+        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new ForbiddenException();
         if(rating == null) return "NOT_EXIST";
         ratingMapper.updateRatingById(ratingId,score,description);
         BoardEntity board = boardMapper.getBoardById(rating.board_id());
@@ -128,7 +129,7 @@ public class RatingService {
     public String deleteRating(Integer ratingId){
         if (ratingId <= 0) return "INVALID";
         RatingEntity rating = ratingMapper.getRatingById(ratingId);
-        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new UnauthorizedException();
+        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new ForbiddenException();
         if (rating == null) return "NOT_EXIST";
         ratingMapper.deleteRatingById(ratingId);
         BoardEntity board = boardMapper.getBoardById(rating.board_id());

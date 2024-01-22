@@ -2,6 +2,7 @@ package com.sc.ratings.services;
 
 import com.sc.ratings.entities.BoardEntity;
 import com.sc.ratings.entities.UserEntity;
+import com.sc.ratings.exceptions.ForbiddenException;
 import com.sc.ratings.exceptions.UnauthorizedException;
 import com.sc.ratings.mappers.BoardMapper;
 import com.sc.ratings.mappers.UserMapper;
@@ -78,7 +79,7 @@ public class BoardService {
     public String modifyBoard(Integer board_id, String title, String description){
         if (!(checkTitle(title) && checkDescription(description))) return "INVALID";
         BoardEntity board = boardMapper.getBoardById(board_id);
-        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new UnauthorizedException();
+        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new ForbiddenException();
         if (board == null) return "NOT_EXIST";
         if(boardMapper.getBoardByTitle(title)!=null)
             return "ALREADY_EXIST";
@@ -92,7 +93,7 @@ public class BoardService {
         //INVALID待补充
         if (board_id <= 0) return "INVALID";
         BoardEntity board = boardMapper.getBoardById(board_id);
-        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new UnauthorizedException();
+        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new ForbiddenException();
         if (board == null) return "NOT_EXIST";
         boardMapper.deleteBoardById(board_id);
         return "SUCCESS";
