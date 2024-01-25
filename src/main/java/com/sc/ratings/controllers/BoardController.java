@@ -34,7 +34,7 @@ public class BoardController {
                 .set("board_id", board.board_id())
                 .set("title", board.title())
                 .set("description", board.description())
-                .set("overall_score", board.overall_score())
+                .set("overall_score", (float)(Math.round(board.overall_score()*10))/10)
                 .set("scores", new Integer[]{board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()})
                 .set("score_cnt", board.score_1()+board.score_2()+board.score_3()+board.score_4()+board.score_5())
                 .set("creator", DataMap.builder()

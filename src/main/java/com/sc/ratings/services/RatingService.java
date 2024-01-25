@@ -142,7 +142,9 @@ public class RatingService {
             if(oldScore == i+1) scoreCnt[i]-=1;
             userCnt+=scoreCnt[i];
         }
-        Float average = ((scoreSum-oldScore)/(float)userCnt);
+        Float average = (float)0;
+        if(userCnt!=0)
+            average = ((scoreSum-oldScore)/(float)userCnt);
         boardMapper.updateBoardScore(rating.board_id(),average,scoreCnt[0],scoreCnt[1],scoreCnt[2],scoreCnt[3],scoreCnt[4]);
         return "SUCCESS";
     }
