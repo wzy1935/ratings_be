@@ -26,4 +26,7 @@ public interface RatingMapper {
 
     @Delete("delete from app_rating where rating_id=#{rating_id}")
     void deleteRatingById(Integer rating_id);
+
+    @Delete("delete from app_rating where board_id=#{board_id}")
+    void deleteRatingFromBoard(Integer board_id);
 }

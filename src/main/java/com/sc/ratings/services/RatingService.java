@@ -64,7 +64,7 @@ public class RatingService {
         for (int i=start;i<end;i++){
             returnList.add(getList.get(i));
         }
-        Integer totalCnt = returnList.size();
+        Integer totalCnt = getList.size();
         return new RatingService.GetPageRatingRT("SUCCESS",totalCnt,returnList);
     }
 
@@ -106,9 +106,9 @@ public class RatingService {
     public String modifyRating(Integer ratingId, Integer score, String description) {
         if(!(checkScore(score) && checkDescription(description))) return "INVALID";
         RatingEntity rating = ratingMapper.getRatingById(ratingId);
-        if(score.equals(rating.score())) return "INVALID";
-        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new ForbiddenException();
         if(rating == null) return "NOT_EXIST";
+        if(!isRatingCreatorOrAdmin(rating.creator_name())) throw new ForbiddenException();
+
         ratingMapper.updateRatingById(ratingId,score,description);
         BoardEntity board = boardMapper.getBoardById(rating.board_id());
         Integer[] scoreCnt = {board.score_1(),board.score_2(),board.score_3(),board.score_4(),board.score_5()};

@@ -5,6 +5,7 @@ import com.sc.ratings.entities.UserEntity;
 import com.sc.ratings.exceptions.ForbiddenException;
 import com.sc.ratings.exceptions.UnauthorizedException;
 import com.sc.ratings.mappers.BoardMapper;
+import com.sc.ratings.mappers.RatingMapper;
 import com.sc.ratings.mappers.UserMapper;
 import com.sc.ratings.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class BoardService {
     BoardMapper boardMapper;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    RatingMapper ratingMapper;
     @Autowired
     AuthUtils authUtils;
 
@@ -79,9 +82,9 @@ public class BoardService {
     public String modifyBoard(Integer board_id, String title, String description){
         if (!(checkTitle(title) && checkDescription(description))) return "INVALID";
         BoardEntity board = boardMapper.getBoardById(board_id);
-        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new ForbiddenException();
         if (board == null) return "NOT_EXIST";
-        if(boardMapper.getBoardByTitle(title)!=null)
+        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new ForbiddenException();
+        if(!board.title().equals(title) && boardMapper.getBoardByTitle(title)!=null)
             return "ALREADY_EXIST";
         boardMapper.updateBoardById(board.board_id(),title,description);
         return "SUCCESS";
@@ -93,8 +96,10 @@ public class BoardService {
         //INVALID待补充
         if (board_id <= 0) return "INVALID";
         BoardEntity board = boardMapper.getBoardById(board_id);
-        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new ForbiddenException();
         if (board == null) return "NOT_EXIST";
+        if(!isBoardCreatorOrAdmin(board.creator_name())) throw new ForbiddenException();
+
+        ratingMapper.deleteRatingFromBoard(board_id);
         boardMapper.deleteBoardById(board_id);
         return "SUCCESS";
     }
